@@ -74,7 +74,7 @@ export default function GameScreen({ route, navigation }) {
                   onPress: () =>
                     navigation.reset({
                       index: 0,
-                      routes: [{ name: "tovabb" }], // "tovabb.js" helyett csak a képernyő neve kell
+                      routes: [{ name: "MatchResults" }], // "tovabb.js" helyett csak a képernyő neve kell
                     }),
                 },
                 {
