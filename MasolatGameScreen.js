@@ -65,29 +65,16 @@ export default function GameScreen({ route, navigation }) {
 
         if (currentStats.legsWon >= legs) {
           if (sets === 1 || currentStats.setsWon + 1 >= sets) {
-            const winner = currentPlayer; // A győztes játékos neve
-
             Alert.alert(
               "Game Over",
-              `${winner} wins the game! Do you want to save your results?`,
+              `${currentPlayer} wins the game! Do you want to save your results?`,
               [
                 {
                   text: "Yes",
                   onPress: () =>
                     navigation.reset({
                       index: 0,
-                      routes: [{ name: "MatchResults", params: { 
-                          dartsThrown: currentStats.dartsThrown, 
-                          startingPlayer: startingPlayer, 
-                          selectedPlayers: selectedPlayers, //
-                          winner: winner,  // Győztes játékos
-                          setsWon: currentStats.setsWon,
-                          legsWon: currentStats.legsWon,//
-                          highestCheckout: currentStats.highestCheckout,
-                          totalPoints: currentStats.totalPoints,//
-                          avgPoints:calculateAverage(winner)
-                        
-                      } }],
+                      routes: [{ name: "MatchResults" }], // "tovabb.js" helyett csak a képernyő neve kell
                     }),
                 },
                 {
@@ -219,7 +206,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
-    marginTop: 70, // Added margin to push the header lower
   },
   playerContainer: {
     flex: 1,
@@ -265,7 +251,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    marginTop: 50, // Added margin to push the number pad lower
   },
   numberButton: {
     width: "30%",

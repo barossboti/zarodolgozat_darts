@@ -13,6 +13,7 @@ export default function Tovabbitbackend({ route }) {
       <Text>Sets Won: {setsWon}</Text>
       <Text>Legs Won: {legsWon}</Text>
       <Text>Highest Checkout: {highestCheckout}</Text>
+
       <Text>Selected Players:</Text>
       {selectedPlayers.map((player, index) => (
         <Text key={index}>{player}</Text>

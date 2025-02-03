@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import Ip from '../Ip';
 
 export default function Szabiatlag({route}) {
   const [atlagData, setAtlagData] = useState([]);
@@ -15,7 +16,7 @@ export default function Szabiatlag({route}) {
       var adatok = {
         "bevitel1":nev
       }
-      const response = await fetch('http://192.168.10.65:3000/meccseredmenylekerdez', {
+      const response = await fetch(Ip.Ipcim+'meccseredmenylekerdez', {
         method: 'POST',
         body: JSON.stringify(adatok),
         headers: {"Content-type": "application/json; charset=UTF-8"},

@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal, Pressable } from 'react-native';
+import Ip from '../Ip';
 
-export default function Beleptetes({ navigation }) {
+export default function Beleptetes({ navigation,route }) {
+  const { avgPoints,dartsThrown, startingPlayer, selectedPlayers, winner, setsWon,legsWon, highestCheckout, } = route.params;
+  //alert(dartsThrown)
   const [felhasznaloNev, setFelhasznalonev] = useState('');
   const [jelszo, setJelszo] = useState('');
   const [belepett, setBelepett] = useState(false);
   const [id, setId] = useState(false);
   const [nev, setNev] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
+  
   const belepesFv = async () => {
     var adatok = {
       "bevitel1": felhasznaloNev,
       "bevitel2": jelszo,
     };
-    const x = await fetch("http://192.168.10.65:3000/beleptetes", {
+    const x = await fetch(Ip.Ipcim+"beleptetes", {
       method: "POST",
       body: JSON.stringify(adatok),
       headers: { "Content-type": "application/json; charset=UTF-8" },
@@ -69,7 +72,7 @@ export default function Beleptetes({ navigation }) {
           </Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Home", { id: id, nev: nev })}
+            onPress={() => navigation.navigate("Home", { id: id, nev: nev,dartsThrown:dartsThrown,startingPlayer:startingPlayer,selectedPlayers:selectedPlayers,winner:winner,setsWon:setsWon,legsWon:legsWon,highestCheckout:highestCheckout,avgPoints:avgPoints })}
           >
             <Text style={styles.buttonText}>Tovább</Text>
           </TouchableOpacity>
@@ -79,6 +82,7 @@ export default function Beleptetes({ navigation }) {
           >
             <Text style={styles.buttonText}>Kilépés</Text>
           </TouchableOpacity>
+          
         </View>
       ) : (
         <View style={styles.loginContainer}>

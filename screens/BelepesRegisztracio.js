@@ -2,8 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const BelepesRegisztracio = ({ navigation }) => {
+  
   return (
+    
     <View style={styles.container}>
+
       <Text style={styles.header}>Válassz egy lehetőséget:</Text>
 
       <TouchableOpacity

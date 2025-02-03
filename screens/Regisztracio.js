@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import Ip from '../Ip';
 
 export default function Regisztracio({ navigation }) {
   const [felhasznaloNev, setFelhasznalonev] = useState('');
@@ -16,7 +17,7 @@ export default function Regisztracio({ navigation }) {
       };
 
       try {
-        const response = await fetch('http://192.168.10.65:3000/regisztracio', {
+        const response = await fetch(Ip.Ipcim+'regisztracio', {
           method: 'POST',
           body: JSON.stringify(adatok),
           headers: { 'Content-type': 'application/json; charset=UTF-8' },

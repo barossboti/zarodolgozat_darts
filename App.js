@@ -18,6 +18,7 @@ export default function App() {
         <Stack.Screen name="Order" component={OrderScreen} options={{ title: 'Order', headerShown: false }} />
         <Stack.Screen name="GameScreen" component={GameScreen} options={{ title: 'Game', headerShown: false }} />
         <Stack.Screen name="MatchResults" component={MatchResultsScreen} options={{ title: 'Results', headerShown: false }} />
+      
       </Stack.Navigator>
     </NavigationContainer>
   );
