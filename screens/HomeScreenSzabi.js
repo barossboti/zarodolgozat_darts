@@ -8,6 +8,7 @@ export default function HomeScreenSzabi({ navigation, route }) {
   const [meccsEredmeny, setMeccsEredmeny] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  //alert(id)
   const fetchMatchResults = async () => {
     try {
       const adatok = { bevitel1: nev };
@@ -47,7 +48,7 @@ export default function HomeScreenSzabi({ navigation, route }) {
         avgPoints: avgPoints,
         highestCheckout: highestCheckout,
         setsWon: setsWon,
-
+        id: id,
 
       };
   
@@ -107,7 +108,7 @@ export default function HomeScreenSzabi({ navigation, route }) {
         </View>
       )}
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+     
         <FlatList
           data={meccsEredmeny}
           keyExtractor={(item) => item.meccseredmeny_id.toString()}
@@ -159,7 +160,7 @@ export default function HomeScreenSzabi({ navigation, route }) {
           )}
           showsVerticalScrollIndicator={false}
         />
-      </ScrollView>
+     
     </View>
   );
 }
