@@ -6,6 +6,8 @@ import OrderScreen from './screens/OrderScreen';
 import NewGameScreen from './screens/NewGameScreen';
 import GameScreen from './screens/GameScreen';
 import MatchResultsScreen from './screens/MatchResults';
+import AddPlayerScreen from './screens/AddPlayer';
+import AboutUsScreen from './screens/AboutUsScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +20,9 @@ export default function App() {
         <Stack.Screen name="Order" component={OrderScreen} options={{ title: 'Order', headerShown: false }} />
         <Stack.Screen name="GameScreen" component={GameScreen} options={{ title: 'Game', headerShown: false }} />
         <Stack.Screen name="MatchResults" component={MatchResultsScreen} options={{ title: 'Results', headerShown: false }} />
+        <Stack.Screen name="AddPlayer" component={AddPlayerScreen}options={{ title: 'Addplayer', headerShown: false }} />
+        <Stack.Screen name="AboutUs" component={AboutUsScreen}options={{ title: 'AboutUs', headerShown: false }} />
+
       
       </Stack.Navigator>
     </NavigationContainer>

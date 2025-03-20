@@ -26,7 +26,7 @@ export default function NewGameScreen({ navigation }) {
 
   const addPlayer = async () => {
     if (newPlayerName.trim() === '') {
-      Alert.alert('Hiba', 'Kérlek adj meg egy nevet!');
+      Alert.alert('Error', 'Please enter a name!');
       return;
     }
 
@@ -36,10 +36,21 @@ export default function NewGameScreen({ navigation }) {
       setPlayers(updatedPlayers);
       setNewPlayerName('');
       setModalVisible(false);
-      Alert.alert('Siker', 'Játékos sikeresen hozzáadva');
+      Alert.alert('Success', 'Player successfully added!');
     } catch (error) {
       console.error('Error saving player:', error);
-      Alert.alert('Hiba', 'Nem sikerült hozzáadni a játékost');
+      Alert.alert('Error', 'Failed to add player!');
+    }
+  };
+
+  const deleteSelectedPlayers = async () => {
+    const remainingPlayers = players.filter(player => !selectedPlayers.includes(player.name));
+    try {
+      await AsyncStorage.setItem('players', JSON.stringify(remainingPlayers));
+      setPlayers(remainingPlayers);
+      setSelectedPlayers([]);
+    } catch (error) {
+      console.error('Error deleting players:', error);
     }
   };
 
@@ -58,9 +69,14 @@ export default function NewGameScreen({ navigation }) {
           <Entypo name="chevron-left" size={24} color="black" />
           <Text style={styles.headerText}>Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.headerButton}>
-          <Entypo name="plus" size={24} color="black" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity onPress={deleteSelectedPlayers} style={styles.headerButton}>
+          <Entypo name="trash" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.headerButton}>
+            <Entypo name="plus" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Text style={styles.title}>Players</Text>
@@ -86,16 +102,15 @@ export default function NewGameScreen({ navigation }) {
         style={styles.footerButton}
         onPress={() => {
           if (selectedPlayers.length === 0) {
-            Alert.alert('Hiba', 'Kérlek válassz legalább egy játékost!');
+            Alert.alert('Error', 'Please select at least one player!');
           } else {
             navigation.navigate('Order', { selectedPlayers });
           }
         }}
       >
-  <Text style={styles.footerButtonText}>NEXT</Text>
-  <Entypo name="chevron-right" size={24} color="black" />
-</TouchableOpacity>
-
+        <Text style={styles.footerButtonText}>NEXT</Text>
+        <Entypo name="chevron-right" size={24} color="black" />
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -146,11 +161,14 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 16,
     borderRadius: 10,
-    margin:5
+    margin:5,
+    marginTop: 40,
   },
   headerButton: {
     flexDirection: 'row',
+    margin: 5,
     alignItems: 'center',
+    padding: 2,
   },
   headerText: {
     fontSize: 16,
@@ -164,6 +182,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 10,
     color: '#000',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+  },
+  selectedPlayerButton: {
+    backgroundColor: '#c3d7c3',
   },
   subtitle: {
     fontSize: 14,

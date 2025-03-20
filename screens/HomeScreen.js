@@ -5,33 +5,42 @@ import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 export default function HomeScreen({ navigation }) {
   
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Darts Counter</Text>
+<View style={styles.container}>
+  <Text style={styles.header}>Darts Counter</Text>
 
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('NewGame')}
-        >
-          <Entypo name="target" size={32} color="#000" />
-          <Text style={styles.buttonText}>New Game</Text>
-        </TouchableOpacity>
+  <View style={styles.buttonsContainer}>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate('NewGame')}
+    >
+      <Entypo name="gamepad-variant" size={32} color="#000" />
+      <Text style={styles.buttonText}>New Game</Text>
+    </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <MaterialCommunityIcons name="account" size={32} color="#000" />
-          <Text style={styles.buttonText}>Profile</Text>
-        </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate('AboutUs')}
+    >
+      <MaterialCommunityIcons name="exclamation-thick" size={32} color="#000" />
+      <Text style={styles.buttonText}>About us</Text>
+    </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Entypo name="add-user" size={32} color="#000" />
-          <Text style={styles.buttonText}>Add Player</Text>
-        </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate('AddPlayer')}
+    >
+      <Entypo name="add-user" size={32} color="#000" />
+      <Text style={styles.buttonText}>Add Player</Text>
+    </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <MaterialCommunityIcons name="chart-bar" size={32} color="#000" />
-          <Text style={styles.buttonText}>Stats</Text>
-        </TouchableOpacity>
-      </View>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate('Stats')}
+    >
+      <MaterialCommunityIcons name="chart-bar" size={32} color="#000" />
+      <Text style={styles.buttonText}>Stats</Text>
+    </TouchableOpacity>
+  </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>darts counter - 2025</Text>
@@ -49,11 +58,12 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   header: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#000',
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: 70,
+    
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -86,6 +96,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 10,
     alignItems: 'center',
+    marginTop: 50,
   },
   footerText: {
     fontSize: 14,

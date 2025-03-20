@@ -42,31 +42,30 @@ export default function GameScreen({ route, navigation }) {
     setInputValue(Math.floor(inputValue / 10));
   };
 
+  const invalidCheckouts = [169, 168, 165, 163, 162, 159];
+
   const handleSubmit = () => {
     const currentPlayer = selectedPlayers[currentPlayerIndex];
-
+  
     setPlayerStats((prevStats) => {
       const updatedStats = { ...prevStats };
       const currentStats = updatedStats[currentPlayer];
-      const newScore = Math.max(currentStats.score - inputValue, 0);
-
-      setHistory([
-        ...history,
-        { player: currentPlayer, prevScore: currentStats.score, input: inputValue },
-      ]);
-
-      currentStats.score = newScore;
-      currentStats.dartsThrown += 3;
-      currentStats.totalPoints += inputValue;
-
+      const newScore = currentStats.score - inputValue;
+  
+      // Ha a dobás túlmegy a pontszámon, 1-et hagyna, vagy 170 feletti maradék lenne kiszállóként, akkor érvénytelen
+      if (newScore < 0 || newScore === 1 || (newScore === 0 && currentStats.score > 170)) {
+        Alert.alert("Invalid score", "You can't exceed your remaining points, leave 1 point, or check out above 170. Try again.");
+        return updatedStats;
+      }
+  
+      // Ha a játékos sikeresen kiszállt, azaz pontosan 0-ra jutott
       if (newScore === 0) {
         currentStats.legsWon += 1;
         currentStats.highestCheckout = Math.max(currentStats.highestCheckout, inputValue);
-
+  
         if (currentStats.legsWon >= legs) {
           if (sets === 1 || currentStats.setsWon + 1 >= sets) {
-            const winner = currentPlayer; // A győztes játékos neve
-
+            const winner = currentPlayer;
             Alert.alert(
               "Game Over",
               `${winner} wins the game! Do you want to save your results?`,
@@ -76,49 +75,52 @@ export default function GameScreen({ route, navigation }) {
                   onPress: () =>
                     navigation.reset({
                       index: 0,
-                      routes: [{ name: "MatchResults", params: { 
-                          dartsThrown: currentStats.dartsThrown, 
-                          startingPlayer: startingPlayer, 
-                          selectedPlayers: selectedPlayers, //
-                          winner: winner,  // Győztes játékos
+                      routes: [{
+                        name: "MatchResults",
+                        params: {
+                          dartsThrown: currentStats.dartsThrown,
+                          startingPlayer: startingPlayer,
+                          selectedPlayers: selectedPlayers,
+                          winner: winner,
                           setsWon: currentStats.setsWon,
-                          legsWon: currentStats.legsWon,//
+                          legsWon: currentStats.legsWon,
                           highestCheckout: currentStats.highestCheckout,
-                          totalPoints: currentStats.totalPoints,//
-                          avgPoints:calculateAverage(winner)
-                        
-                      } }],
+                          totalPoints: currentStats.totalPoints,
+                          avgPoints: calculateAverage(winner),
+                        },
+                      }],
                     }),
                 },
                 {
                   text: "No",
-                  onPress: () =>
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: "HomeScreen" }],
-                    }),
+                  onPress: () => navigation.reset({ index: 0, routes: [{ name: "HomeScreen" }] }),
                 },
               ]
             );
             return updatedStats;
           }
-
-          currentStats.setsWon += 1;
-          currentStats.legsWon = 0;
         }
-
+  
         // Reset scores for next leg
         Object.keys(updatedStats).forEach((key) => {
           updatedStats[key].score = 501;
         });
+      } else {
+        // Normál dobás esetén a pontszám csökken
+        setHistory([...history, { player: currentPlayer, prevScore: currentStats.score, input: inputValue }]);
+        currentStats.score = newScore;
+        currentStats.dartsThrown += 3;
+        currentStats.totalPoints += inputValue;
       }
-
+  
       return updatedStats;
     });
-
+  
     setInputValue(0);
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % selectedPlayers.length);
   };
+  
+  
 
   const handleUndo = () => {
     if (history.length > 0) {
@@ -145,21 +147,18 @@ export default function GameScreen({ route, navigation }) {
             style={[
               styles.playerContainer,
               index === currentPlayerIndex && styles.activePlayer,
+              index === currentPlayerIndex &&
+                invalidCheckouts.includes(playerStats[player].score) &&
+                styles.invalidCheckout
             ]}
           >
             <Text
-              style={[
-                styles.playerScore,
-                index === currentPlayerIndex && styles.activePlayerScore,
-              ]}
+              style={[styles.playerScore, index === currentPlayerIndex && styles.activePlayerScore]}
             >
               {playerStats[player].score}
             </Text>
             <Text
-              style={[
-                styles.playerName,
-                index === currentPlayerIndex && styles.activePlayerText,
-              ]}
+              style={[styles.playerName, index === currentPlayerIndex && styles.activePlayerText]}
             >
               {player}
             </Text>
@@ -219,7 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
-    marginTop: 70, // Added margin to push the header lower
+    marginTop: 70, 
   },
   playerContainer: {
     flex: 1,
@@ -231,6 +230,9 @@ const styles = StyleSheet.create({
   },
   activePlayer: {
     backgroundColor: "#1E441E",
+  },
+  invalidCheckout: {
+    backgroundColor: "red",
   },
   playerScore: {
     fontSize: 36,
@@ -265,7 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    marginTop: 50, // Added margin to push the number pad lower
+    marginTop: 50, 
   },
   numberButton: {
     width: "30%",
