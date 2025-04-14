@@ -5,8 +5,8 @@ import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 export default function OrderScreen({ navigation, route }) {
   const { selectedPlayers } = route.params;
   const [startingPlayer, setStartingPlayer] = useState(selectedPlayers[0]);
-  const [sets, setSets] = useState(1); // Default value for sets
-  const [legs, setLegs] = useState(1); // Default value for legs
+  const [sets, setSets] = useState(1); 
+  const [legs, setLegs] = useState(1); 
 
   const selectStartingPlayer = (player) => {
     setStartingPlayer(player);

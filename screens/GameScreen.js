@@ -11,7 +11,7 @@ export default function GameScreen({ route, navigation }) {
     legsWon: 0,
     setsWon: 0,
     highestCheckout: 0,
-    totalPoints: 0, // Pontszám az átlaghoz
+    totalPoints: 0, 
   };
 
   const [playerStats, setPlayerStats] = useState(
@@ -52,13 +52,11 @@ export default function GameScreen({ route, navigation }) {
       const currentStats = updatedStats[currentPlayer];
       const newScore = currentStats.score - inputValue;
   
-      // Ha a dobás túlmegy a pontszámon, 1-et hagyna, vagy 170 feletti maradék lenne kiszállóként, akkor érvénytelen
       if (newScore < 0 || newScore === 1 || (newScore === 0 && currentStats.score > 170)) {
         Alert.alert("Invalid score", "You can't exceed your remaining points, leave 1 point, or check out above 170. Try again.");
         return updatedStats;
       }
   
-      // Ha a játékos sikeresen kiszállt, azaz pontosan 0-ra jutott
       if (newScore === 0) {
         currentStats.legsWon += 1;
         currentStats.highestCheckout = Math.max(currentStats.highestCheckout, inputValue);
@@ -101,12 +99,10 @@ export default function GameScreen({ route, navigation }) {
           }
         }
   
-        // Reset scores for next leg
         Object.keys(updatedStats).forEach((key) => {
           updatedStats[key].score = 501;
         });
       } else {
-        // Normál dobás esetén a pontszám csökken
         setHistory([...history, { player: currentPlayer, prevScore: currentStats.score, input: inputValue }]);
         currentStats.score = newScore;
         currentStats.dartsThrown += 3;
