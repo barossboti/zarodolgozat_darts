@@ -3,8 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal, Pressable }
 import Ip from '../Ip';
 
 export default function Beleptetes({ navigation,route }) {
-  const { avgPoints,dartsThrown, startingPlayer, selectedPlayers, winner, setsWon,legsWon, highestCheckout, } = route.params;
-  //alert(dartsThrown)
+  const { avgPoints, dartsThrown, startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout } = route.params;
   const [felhasznaloNev, setFelhasznalonev] = useState('');
   const [jelszo, setJelszo] = useState('');
   const [belepett, setBelepett] = useState(false);
@@ -24,7 +23,7 @@ export default function Beleptetes({ navigation,route }) {
     });
     const y = await x.json();
     if (y.length == 0) {
-      alert("Helytelen felhasználónév vagy jelszó");
+      alert("Incorrect username or password");
     } else {
       setBelepett(true);
       setNev(y[0].felhasznalo_nev);
@@ -34,6 +33,7 @@ export default function Beleptetes({ navigation,route }) {
 
   return (
     <View style={styles.container}>
+      
       <Modal
         transparent={true}
         visible={showModal}
@@ -42,8 +42,8 @@ export default function Beleptetes({ navigation,route }) {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Megerősítés</Text>
-            <Text style={styles.modalText}>Biztosan ki szeretnél lépni?</Text>
+            <Text style={styles.modalTitle}>Confirmation</Text>
+            <Text style={styles.modalText}>Are you sure you want to log out?</Text>
             <View style={styles.modalButtonContainer}>
               <Pressable
                 style={[styles.modalButton, { backgroundColor: '#B22222' }]}
@@ -52,13 +52,13 @@ export default function Beleptetes({ navigation,route }) {
                   setBelepett(false);
                 }}
               >
-                <Text style={styles.modalButtonText}>Kilépés</Text>
+                <Text style={styles.modalButtonText}>Log Out</Text>
               </Pressable>
               <Pressable
                 style={[styles.modalButton, { backgroundColor: '#1E441E' }]}
                 onPress={() => setShowModal(false)}
               >
-                <Text style={styles.modalButtonText}>Mégse</Text>
+                <Text style={styles.modalButtonText}>Cancel</Text>
               </Pressable>
             </View>
           </View>
@@ -68,51 +68,51 @@ export default function Beleptetes({ navigation,route }) {
       {belepett ? (
         <View style={styles.loggedInContainer}>
           <Text style={styles.welcomeText}>
-            Üdvözöllek {nev} ({id})
+            Welcome, {nev} ({id})
           </Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Home", { id: id, nev: nev,dartsThrown:dartsThrown,startingPlayer:startingPlayer,selectedPlayers:selectedPlayers,winner:winner,setsWon:setsWon,legsWon:legsWon,highestCheckout:highestCheckout,avgPoints:avgPoints })}
           >
-            <Text style={styles.buttonText}>Tovább</Text>
+            <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#B22222" }]}
             onPress={() => setShowModal(true)}
           >
-            <Text style={styles.buttonText}>Kilépés</Text>
+            <Text style={styles.buttonText}>Log Out</Text>
           </TouchableOpacity>
           
         </View>
       ) : (
         <View style={styles.loginContainer}>
-          <Text style={styles.header}>Belépés</Text>
+          <Text style={styles.header}>Login</Text>
 
           <TextInput
             style={styles.input}
             onChangeText={setFelhasznalonev}
-            placeholder="Felhasználónév"
+            placeholder="Username"
             value={felhasznaloNev}
           />
           <TextInput
             style={styles.input}
             onChangeText={setJelszo}
-            placeholder="Jelszó"
+            placeholder="Password"
             value={jelszo}
             secureTextEntry
           />
 
           <TouchableOpacity style={styles.button} onPress={belepesFv}>
-            <Text style={styles.buttonText}>Belépés</Text>
+            <Text style={styles.buttonText}>Log In</Text>
           </TouchableOpacity>
 
           <View style={styles.registerContainer}>
-            <Text style={styles.noAccountText}>Még nem rendelkezel fiókkal?</Text>
+            <Text style={styles.noAccountText}>Don't have an account yet?</Text>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: "#1E441E" }]}
-              onPress={() => navigation.navigate("Regisztracio")}
+              onPress={() => navigation.navigate("Registration")}
             >
-              <Text style={[styles.buttonText, { color: "#FFFF" }]}>Regisztráció</Text>
+              <Text style={[styles.buttonText, { color: "#FFFF" }]}>Register</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -191,6 +191,13 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 5,
+  },
+  welcomeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
   },
   header: {
     fontSize: 24,

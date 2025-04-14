@@ -24,7 +24,7 @@ export default function MatchResults({route}) {
           component={HomeScreenSzabi}
           
           options={{
-            title: 'Kezdőlap',
+            title: 'Home',
             headerStyle: { backgroundColor: '#D5E2D5' }, // Header background color
             headerTintColor: '#1B3F1B', // Header text color
           }}
@@ -35,7 +35,7 @@ export default function MatchResults({route}) {
           name="Szabiatlag"
           component={SzabiatlagScreen}
           initialParams={{ dartsThrown,startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout,avgPoints }} 
-          options={{ title: 'Statisztikák',
+          options={{ title: 'Statics',
           headerStyle: { backgroundColor: '#D5E2D5' }, // Header background color
           headerTintColor: '#1B3F1B', // Header text color
         }} // Optionally customize header for this screen
@@ -44,7 +44,7 @@ export default function MatchResults({route}) {
           name="Beleptetes"
           component={Beleptetes}
           initialParams={{ dartsThrown,startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout,avgPoints }} 
-          options={{ title: 'Kilépés',
+          options={{ title: 'Login',
           headerStyle: { backgroundColor: '#D5E2D5' }, // Header background color
           headerTintColor: '#1B3F1B', // Header text color
         }} // Optionally customize header for this screen
@@ -54,21 +54,24 @@ export default function MatchResults({route}) {
           name="Regisztracio"
           component={Regisztracio}
           initialParams={{ dartsThrown,startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout,avgPoints }} 
-          options={{ title: 'Regisztráció',
+          options={{ title: 'Registration',
           headerStyle: { backgroundColor: '#D5E2D5' }, // Header background color
           headerTintColor: '#1B3F1B', // Header text color
         }} // Optionally customize header for this screen
         />
 
-        <Stack.Screen
+          <Stack.Screen
           name="BelepesRegisztracio"
           component={BelepesRegisztracio}
           initialParams={{ dartsThrown,startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout,avgPoints }} 
-          options={{ title: 'Vissza',headerShown:false,
+          options={{ title: 'Login',headerShown:true,
           headerStyle: { backgroundColor: '#D5E2D5' }, // Header background color
           headerTintColor: '#1B3F1B', // Header text color
         }} // Optionally customize header for this screen
         />
+
+        
+        
       </Stack.Navigator>
   
   );

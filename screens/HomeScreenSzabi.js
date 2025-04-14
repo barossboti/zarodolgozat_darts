@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, Button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Button } from 'react-native';
 import Ip from '../Ip';
 
 export default function HomeScreenSzabi({ navigation, route }) {
-  const { id, nev, dartsThrown,startingPlayer, selectedPlayers, winner, setsWon,legsWon, highestCheckout,avgPoints} = route.params || {};
+  const { id, nev, dartsThrown, startingPlayer, selectedPlayers, winner, setsWon, legsWon, highestCheckout, avgPoints } = route.params || {};
 
-  const [meccsEredmeny, setMeccsEredmeny] = useState([]);
+  const [matchResults, setMatchResults] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  //alert(id)
   const fetchMatchResults = async () => {
     try {
-      const adatok = { bevitel1: nev };
-      const response = await fetch(Ip.Ipcim+'meccseredmenylekerdez', {
+      const data = { bevitel1: nev };
+      const response = await fetch(Ip.Ipcim + 'meccseredmenylekerdez', {
         method: 'POST',
-        body: JSON.stringify(adatok),
+        body: JSON.stringify(data),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
 
@@ -22,26 +21,25 @@ export default function HomeScreenSzabi({ navigation, route }) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const data = await response.json();
-      setMeccsEredmeny(data);
+      const result = await response.json();
+      setMatchResults(result);
     } catch (error) {
       console.error('Error fetching match results:', error);
-      setErrorMessage('Nem sikerült lekérni az adatokat.');
+      setErrorMessage('Failed to retrieve data.');
     }
   };
-  const fetchMeccseredmeny = async () => {
+
+  const submitMatchResults = async () => {
     try {
       const today = new Date();
-  
-      // A dátum és idő formázása 'YYYY-MM-DD HH:MM:SS' formátumban
       const formattedDate = today.getFullYear() + '-' +
                             ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
                             ('0' + today.getDate()).slice(-2) + ' ' +
                             ('0' + today.getHours()).slice(-2) + ':' +
                             ('0' + today.getMinutes()).slice(-2) + ':' +
                             ('0' + today.getSeconds()).slice(-2);
-  
-      const adatok = {
+
+      const data = {
         winner: winner,
         date: formattedDate,
         dartsThrown: dartsThrown,
@@ -49,44 +47,41 @@ export default function HomeScreenSzabi({ navigation, route }) {
         highestCheckout: highestCheckout,
         setsWon: setsWon,
         id: id,
-
       };
-  
-      const response = await fetch(Ip.Ipcim+'meccseredmenyFelvitel', {
+
+      const response = await fetch(Ip.Ipcim + 'meccseredmenyFelvitel', {
         method: 'POST',
-        body: JSON.stringify(adatok),
+        body: JSON.stringify(data),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
-      const szoveg = await response.text();
-      alert(szoveg);
+
+      const message = await response.text();
+      alert(message);
     } catch (error) {
-      console.error('Error fetching match results:', error);
-      setErrorMessage('Nem sikerült felvinni az adatokat.');
+      console.error('Error submitting match results:', error);
+      setErrorMessage('Failed to submit data.');
     }
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
-      await fetchMeccseredmeny(); // Megvárja, amíg ez lefut
-      fetchMatchResults(); // Csak ezután hívja meg a másodikat
+      await submitMatchResults();
+      fetchMatchResults();
     };
-  
     fetchData();
   }, []);
-  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Darts Mérkőzés Eredményei</Text>
+      <Text style={styles.header}>Darts Match Results</Text>
 
       <View style={styles.buttonContainer}>
         <Button
-          title="A statisztikáid megjelenítéséhez kattints ide!"
+          title="Click here to view your statistics!"
           onPress={() => navigation.navigate('Szabiatlag', { id, nev })}
           color="#1B3F1B"
         />
@@ -94,73 +89,61 @@ export default function HomeScreenSzabi({ navigation, route }) {
 
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
-      {/* Csak akkor jelenik meg, ha van dartsThrown érték */}
-      {dartsThrown !== undefined && (
-        <View style={styles.dartsStatsContainer}>
-          <Text style={styles.statsHeader}>Mostani</Text>
-          <Text style={styles.statsText}>Dobások száma: {dartsThrown}</Text>
-          <Text style={styles.statsText}>Első: {startingPlayer}</Text>
-          <Text style={styles.statsText}>Első: {selectedPlayers}</Text>
-          <Text style={styles.statsText}>Első: {winner}</Text>
-          <Text style={styles.statsText}>Első: {setsWon}</Text>
-          <Text style={styles.statsText}>Első: {legsWon}</Text>
-          <Text style={styles.statsText}>Első: {avgPoints}</Text>
-        </View>
-      )}
+      
+        
+      
 
-     
-        <FlatList
-          data={meccsEredmeny}
-          keyExtractor={(item) => item.meccseredmeny_id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.matchCard}>
-              <View style={styles.matchHeader}>
-                <Text style={styles.matchTitle}>Eredmény:</Text>
-                <Text style={styles.matchResult}>{item.meccseredmeny_eredmeny}</Text>
-              </View>
-
-              <View style={styles.matchDetails}>
-                <Text style={styles.matchDetailTitle}>Dátum:</Text>
-                <Text style={styles.matchDetailInfo}>{item.meccseredmeny_datum}</Text>
-
-                <Text style={styles.matchDetailTitle}>Győztes:</Text>
-                <Text style={styles.matchDetailInfo}>{item.meccseredmeny_gyoztes}</Text>
-
-                <Text style={styles.matchDetailTitle}>Vesztes:</Text>
-                <Text style={styles.matchDetailInfo}>{item.meccseredmeny_vesztes}</Text>
-              </View>
-
-              <View style={styles.statContainer}>
-                <Text style={styles.statTitle}>Győztes átlaga:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_atlaggyoztes}</Text>
-
-                <Text style={styles.statTitle}>Vesztes átlaga:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_atlagvesztes}</Text>
-
-                <Text style={styles.statTitle}>Győztes kiszálló:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_gyozteskiszallo}</Text>
-
-                <Text style={styles.statTitle}>Legnagyobb kiszálló:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_gyozteslegnagyobb}</Text>
-
-                <Text style={styles.statTitle}>Körök száma:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_gyozteskorszam}</Text>
-
-                <Text style={styles.statTitle}>Dobások száma:</Text>
-                <Text style={styles.statValue}>{item.meccseredmeny_gyoztesdobas}</Text>
-              </View>
-
-              <View style={styles.iconContainer}>
-                <Image
-                  source={require('../assets/darts-icon.png')}
-                  style={styles.dartsIcon}
-                />
-              </View>
+      <FlatList
+        data={matchResults}
+        keyExtractor={(item) => item.meccseredmeny_id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.matchCard}>
+            <View style={styles.matchHeader}>
+              <Text style={styles.matchTitle}>Result:</Text>
+              <Text style={styles.matchResult}>{item.meccseredmeny_eredmeny}</Text>
             </View>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
-     
+
+            <View style={styles.matchDetails}>
+              <Text style={styles.matchDetailTitle}>Date:</Text>
+              <Text style={styles.matchDetailInfo}>{item.meccseredmeny_datum}</Text>
+
+              <Text style={styles.matchDetailTitle}>Winner:</Text>
+              <Text style={styles.matchDetailInfo}>{item.meccseredmeny_gyoztes}</Text>
+
+              <Text style={styles.matchDetailTitle}>Loser:</Text>
+              <Text style={styles.matchDetailInfo}>{item.meccseredmeny_vesztes}</Text>
+            </View>
+
+            <View style={styles.statContainer}>
+              <Text style={styles.statTitle}>Winner's Average:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_atlaggyoztes}</Text>
+
+              <Text style={styles.statTitle}>Loser's Average:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_atlagvesztes}</Text>
+
+              <Text style={styles.statTitle}>Winner's Checkout:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_gyozteskiszallo}</Text>
+
+              <Text style={styles.statTitle}>Highest Checkout:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_gyozteslegnagyobb}</Text>
+
+              <Text style={styles.statTitle}>Number of Rounds:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_gyozteskorszam}</Text>
+
+              <Text style={styles.statTitle}>Number of Throws:</Text>
+              <Text style={styles.statValue}>{item.meccseredmeny_gyoztesdobas}</Text>
+            </View>
+
+            <View style={styles.iconContainer}>
+              <Image
+                source={require('../assets/darts-icon.png')}
+                style={styles.dartsIcon}
+              />
+            </View>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }

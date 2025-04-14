@@ -28,7 +28,7 @@ export default function AboutUsScreen({ navigation }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => Linking.openURL('https://www.deakbutor.hu')}
+        onPress={() => Linking.openURL('')}
       >
         <Text style={styles.buttonText}>Visit our website for more!</Text>
       </TouchableOpacity>

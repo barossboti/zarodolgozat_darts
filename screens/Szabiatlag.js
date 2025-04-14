@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import Ip from '../Ip';
@@ -6,16 +6,15 @@ import Ip from '../Ip';
 export default function Szabiatlag({route}) {
   const [atlagData, setAtlagData] = useState([]);
   const [selectedData, setSelectedData] = useState(null);
-  const [secondSelectedData, setSecondSelectedData] = useState(null);
-  const [thirdSelectedData, setThirdSelectedData] = useState(null); // Harmadik diagram kiválasztott adatai
   const [errorMessage, setErrorMessage] = useState(null);
-  const {id,nev}=route.params
+  const {id, nev} = route.params;
+  const scrollViewRef = useRef(null);
 
   const fetchAverageData = async () => {
     try {
       var adatok = {
-        "bevitel1":nev
-      }
+        "bevitel1": nev
+      };
       const response = await fetch(Ip.Ipcim+'meccseredmenylekerdez', {
         method: 'POST',
         body: JSON.stringify(adatok),
@@ -29,42 +28,50 @@ export default function Szabiatlag({route}) {
       const data = await response.json();
       setAtlagData(data);
     } catch (error) {
-      console.error('Error fetching average data:', error);
-      setErrorMessage('Nem sikerült lekérni az átlag adatokat.');
+      //console.error('Error fetching average data:', error);
+      setErrorMessage('Failed to retrieve the average data.');
     }
   };
 
   useEffect(() => {
+    
     fetchAverageData();
-    //alert(id)
     const interval = setInterval(() => {
       fetchAverageData();
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const filteredData = atlagData
+    .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
+    .sort((a, b) => a.meccs_id - b.meccs_id);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [filteredData]);
+
   return (
     <ScrollView
       style={styles.scrollView}
       contentContainerStyle={styles.scrollContainer}
     >
-      <Text style={styles.header}>Összes dobásod átlagának változása mérkőzésenként!</Text>
+      <Text style={styles.header}>Changes in Your Average Throws per Match!</Text>
 
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
 
-      {/* Első diagram - Átlagdobás */}
-      <LineChart
-        data={{
-          labels: atlagData
-            .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id)
-            .map((item, index) => `Meccs ${index + 1}`),
-          datasets: [
-            {
-              data: atlagData
-                .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-                .sort((a, b) => a.meccs_id - b.meccs_id)
-                .map(item => {
+      <ScrollView 
+        horizontal 
+        contentContainerStyle={styles.chartContainer}
+        ref={scrollViewRef}
+      >
+        <LineChart
+          data={{
+            labels: filteredData.map((item, index) => `Match ${index + 1}`),
+            datasets: [
+              {
+                data: filteredData.map(item => {
                   if (item.meccseredmeny_gyoztes === nev) {
                     return item.meccseredmeny_atlaggyoztes || 0;
                   } else if (item.meccseredmeny_vesztes === nev) {
@@ -73,195 +80,47 @@ export default function Szabiatlag({route}) {
                     return 0;
                   }
                 }),
-              color: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-              strokeWidth: 2,
+                color: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
+                strokeWidth: 3,
+              },
+            ],
+          }}
+          width={Math.max(filteredData.length * 90, Dimensions.get('window').width - 40)}
+          height={300}
+          chartConfig={{
+            backgroundColor: '#D5E2D5',
+            backgroundGradientFrom: '#D5E2D5',
+            backgroundGradientTo: '#F7FFF7',
+            decimalPlaces: 1,
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
+            style: {
+              borderRadius: 16,
             },
-          ],
-        }}
-        width={Dimensions.get('window').width - 30}
-        height={220}
-        chartConfig={{
-          backgroundColor: '#D5E2D5',
-          backgroundGradientFrom: '#D5E2D5',
-          backgroundGradientTo: '#F7FFF7',
-          decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "4",
-            strokeWidth: "2",
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 20,
-          borderRadius: 16,
-        }}
-        onDataPointClick={(data) => {
-          const index = data.index;
-          const filteredData = atlagData
-            .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id);
-          const selectedItem = filteredData[index];
-          setSelectedData(selectedItem);
-        }}
-      />
+            propsForDots: {
+              r: "5",
+              strokeWidth: "2",
+            },
+          }}
+          bezier
+          style={styles.chartStyle}
+          onDataPointClick={(data) => {
+            const index = data.index;
+            const selectedItem = filteredData[index];
+            setSelectedData(selectedItem);
+          }}
+        />
+      </ScrollView>
 
       {selectedData && (
         <View style={styles.selectedDataContainer}>
           <Text style={styles.selectedDataText}>
-            Átlagdobás: {selectedData.meccseredmeny_gyoztes === nev
+            Average Throw: {selectedData.meccseredmeny_gyoztes === nev
               ? selectedData.meccseredmeny_atlaggyoztes
               : selectedData.meccseredmeny_atlagvesztes}
           </Text>
         </View>
       )}
-
-      <Text style={styles.header2}>Az első dobásod mérkőzésenként:</Text>
-
-      {/* Második diagram - Legnagyobb dobás */}
-      <LineChart
-        data={{
-          labels: atlagData
-            .filter(item => item.meccs_elsojatekos === nev|| item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id)
-            .map((item, index) => `Meccs ${index + 1}`),
-          datasets: [
-            {
-              data: atlagData
-                .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-                .sort((a, b) => a.meccs_id - b.meccs_id)
-                .map(item => {
-                  if (item.meccseredmeny_gyoztes === nev) {
-                    return item.meccseredmeny_gyoztesdobas || 0;
-                  } else if (item.meccseredmeny_vesztes === nev) {
-                    return item.meccseredmeny_vesztesdobas || 0;
-                  } else {
-                    return 0;
-                  }
-                }),
-              color: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-        }}
-        width={Dimensions.get("window").width - 30}
-        height={220}
-        chartConfig={{
-          backgroundColor: '#D5E2D5',
-          backgroundGradientFrom: '#D5E2D5',
-          backgroundGradientTo: '#F7FFF7',
-          decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "4",
-            strokeWidth: "2",
-            stroke: "#1B3F1B",
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 20,
-          borderRadius: 16,
-        }}
-        onDataPointClick={(data) => {
-          const index = data.index;
-          const filteredData = atlagData
-            .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id);
-          const selectedItem = filteredData[index];
-          setSecondSelectedData(selectedItem);
-        }}
-      />
-
-      {secondSelectedData && (
-        <View style={styles.selectedDataContainer}>
-          <Text style={styles.selectedDataText}>
-            Első dobás: {secondSelectedData.meccseredmeny_gyoztes === nev
-              ? secondSelectedData.meccseredmeny_gyoztesdobas
-              : secondSelectedData.meccseredmeny_vesztesdobas}
-          </Text>
-        </View>
-      )}
-
-      <Text style={styles.header2}>A legnagyobb dobásod mérkőzésenként:</Text>
-
-      {/* Harmadik diagram - Legnagyobb dobás */}
-      <LineChart
-        data={{
-          labels: atlagData
-            .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id)
-            .map((item, index) => `Meccs ${index + 1}`),
-          datasets: [
-            {
-              data: atlagData
-                .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-                .sort((a, b) => a.meccs_id - b.meccs_id)
-                .map(item => {
-                  if (item.meccseredmeny_gyoztes === nev) {
-                    return item.meccseredmeny_gyozteslegnagyobb || 0;
-                  } else if (item.meccseredmeny_vesztes === nev) {
-                    return item.meccseredmeny_veszteslegnagyobb || 0;
-                  } else {
-                    return 0;
-                  }
-                }),
-              color: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-        }}
-        width={Dimensions.get("window").width - 30}
-        height={220}
-        chartConfig={{
-          backgroundColor: '#D5E2D5',
-          backgroundGradientFrom: '#D5E2D5',
-          backgroundGradientTo: '#F7FFF7',
-          decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(27, 63, 27, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "4",
-            strokeWidth: "2",
-            stroke: "#1B3F1B",
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 20,
-          borderRadius: 16,
-        }}
-        onDataPointClick={(data) => {
-          const index = data.index;
-          const filteredData = atlagData
-            .filter(item => item.meccs_elsojatekos === nev || item.meccs_masodikjatekos === nev)
-            .sort((a, b) => a.meccs_id - b.meccs_id);
-          const selectedItem = filteredData[index];
-          setThirdSelectedData(selectedItem);
-        }}
-      />
-
-      {thirdSelectedData && (
-        <View style={styles.selectedDataContainer}>
-          <Text style={styles.selectedDataText}>
-            Legnagyobb dobás: {thirdSelectedData.meccseredmeny_gyoztes === nev
-              ? thirdSelectedData.meccseredmeny_gyozteslegnagyobb
-              : thirdSelectedData.meccseredmeny_veszteslegnagyobb}
-          </Text>
-        </View>
-      )}
-
     </ScrollView>
   );
 }
@@ -283,18 +142,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  header2: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1B3F1B',
-    marginBottom: 15,
-    textAlign: 'center',
-    paddingTop: 20,
-  },
   error: {
     color: '#FF0000',
     fontSize: 16,
     marginBottom: 20,
+  },
+  chartContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chartStyle: {
+    marginVertical: 20,
+    borderRadius: 16,
+    alignSelf: 'center',
   },
   selectedDataContainer: {
     marginTop: 20,
